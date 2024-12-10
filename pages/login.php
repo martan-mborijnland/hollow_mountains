@@ -5,7 +5,7 @@ if (isset($_SESSION['error'])) {
     unset($_SESSION['error']);
 }
 ?>
-<form action="?page=formHandler" method="post">
+<form action="?page=formHandler" method="post" enctype="multipart/form-data">
     <input type="hidden" name="action" value="login">
     <input type="text" name="username" placeholder="Username">
     <input type="password" name="password" placeholder="Password">

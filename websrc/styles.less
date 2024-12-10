@@ -2,6 +2,9 @@
 @secondary-color: #717171;
 
 
+@input-margin-bottom: 16px;
+
+
 
 * {
     margin: 0;
@@ -18,10 +21,32 @@ body {
     display: grid;
     width: 100vw;
 
+    overflow-x: hidden;
+
     &.has-header {
         grid-template-rows: 50px auto;
     }
 }
+
+.error, .success {
+    position: fixed;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    padding: 10px;
+    font-weight: 600;
+    font-size: 2rem;
+
+    .close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+    }
+}
+
+.error { background: #f00; }
+.success { background: #0f0; }
 
 header {
     width: 100%;
@@ -32,6 +57,8 @@ header {
     grid-template-columns: 1fr 400px 1fr;
     align-items: center;
     justify-content: center;
+
+    border-bottom: 1px solid white;
 
     
     &, a {
@@ -45,6 +72,8 @@ header {
     .header-title { 
         text-align: left; 
         margin-left: 16px;
+        font-size: 2rem;
+        font-weight: 600;
     }
     .header-page-title { text-align: center; }
     .nav { 
@@ -54,6 +83,31 @@ header {
         display: flex;
         flex-direction: row;
         justify-content: flex-end;
+    }
+}
+
+main.has-sidebar {
+    display: grid !important;
+    grid-template-columns: 200px 1fr !important;
+
+    .sidebar {
+        background: @primary-color;
+
+        &, a {
+            color: white !important;
+            text-decoration: none !important;
+        }
+
+        ul {
+            margin: 16px 0 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        li.active {
+            font-weight: 600;
+        }
     }
 }
 
@@ -85,7 +139,7 @@ main#login {
     }
 }
 
-main#medewerkers-overzicht, main#attracties-overzicht {
+main#medewerkers-overzicht, main#attracties-overzicht, main#onderhoud-overzicht {
     a {
         color: #000;
         text-decoration: underline;
@@ -121,7 +175,43 @@ main#medewerkers-overzicht, main#attracties-overzicht {
     }
 }
 
-main#medewerkers-editen {
+main#medewerkers-view, main#attracties-view {
+    a {
+        color: #000;
+        text-decoration: underline;
+
+        transition: text-shadow .1s;
+
+        &:hover {
+            text-shadow: 0 0 .65px #333, 0 0 .65px #333;
+        }
+    }
+
+    table {
+        border-collapse: collapse;
+        margin: 100px auto 0 auto;
+
+        width: 70%;
+        min-width: auto;
+
+        tr {
+            border-bottom: 1px solid @primary-color;
+            height: 2rem;
+        }
+
+        th {
+            background: @secondary-color;
+            color: #FFF;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+    }
+}
+
+main#medewerkers-edit, main#medewerkers-add, main#attracties-edit, main#attracties-add {
     form {
         width: 400px;
         margin: 32px 0 0 32px;
@@ -129,7 +219,7 @@ main#medewerkers-editen {
         flex-direction: column;
 
         input, select {
-            margin-bottom: 16px;
+            margin-bottom: @input-margin-bottom;
             padding: 5px 10px;
 
             outline: 1px solid @primary-color;
@@ -146,38 +236,52 @@ main#medewerkers-editen {
     }
 }
 
-main#medewerkers-view {
-    a {
-        color: #000;
-        text-decoration: underline;
+main#attracties-overzicht {
+    td:has(img) {
+        text-align: center;
+        width: 100px;
+    }
 
-        transition: text-shadow .1s;
+    img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+}
+
+main#attracties-view {
+    img {
+        width: 400px;
+        height: 400px;
+        object-fit: cover;
+    }
+}
+
+main#attracties-edit, main#attracties-add {
+    input[type="file"] {
+        display: none;
+    }
+
+    textarea {
+        outline: 1px solid @primary-color;
+        border-radius: 8px;
+        padding: 5px 10px;
+
+        margin-bottom: @input-margin-bottom;
+
+        resize: none;
+
+        height: 255px;
 
         &:hover {
-            text-shadow: 0 0 .65px #333, 0 0 .65px #333;
+            background: #0001;
         }
     }
 
-    table {
-        border-collapse: collapse;
-        margin: 100px auto;
-
-        width: 70%;
-        min-width: auto;
-
-        tr {
-            border-bottom: 1px solid @primary-color;
-            height: 2rem;
-        }
-
-        th {
-            background: @secondary-color;
-            color: #FFF;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 8px;
-        }
+    .foto-display {
+        height: 200px;
+        width: 200px;
+        background-size: cover;
+        margin-bottom: @input-margin-bottom;
     }
 }

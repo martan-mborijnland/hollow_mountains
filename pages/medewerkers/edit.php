@@ -10,6 +10,11 @@ if (!isset($_GET['id'])) {
     Functions::jsRedirect(url: '?page=medewerkers');
 }
 
+Functions::drawSidebar(options: [ 
+    ['label' => 'Overzicht', 'page' => 'medewerkers.overzicht'],
+    ['label' => 'Add', 'page' => 'medewerkers.add']
+]);
+
 $database = Database::getInstance();
 
 $medewerker_id = DataProcessor::sanitizeData(data: $_GET['id']);
@@ -38,16 +43,16 @@ if (empty($medewerker)) {
 
 ?>
 
-<form action='?page=formHandler' method='post'>
+<form action='?page=formHandler' method='post' enctype="multipart/form-data">
     <input type='hidden' name='action' value='updateMedewerker'>
     <input type='hidden' name='id' value='<?= $medewerker['id'] ?>'>
     <label for="naam">Naam</label>
     <input type='text' name='naam' value='<?= $medewerker['naam'] ?>'>
-    <label for="naam">Gebruikersnaam</label>
+    <label for="gebruikersnaam">Gebruikersnaam</label>
     <input type='text' name='gebruikersnaam' value='<?= $medewerker['gebruikersnaam'] ?>'>
-    <label for="naam">Adres</label>
+    <label for="adres">Adres</label>
     <input type='text' name='adres' value='<?= $medewerker['adres'] ?>'>
-    <label for="naam">Rol</label>
+    <label for="rol_id">Rol</label>
     <select name='rol_id'>
         <?php foreach ($rollen as $rol): ?>
             <option value="<?= $rol['id'] ?>" <?= $rol['id'] == $medewerker['rol_id'] ? 'selected' : '' ?>><?= $rol['naam'] ?></option>

@@ -2,6 +2,12 @@
 
 use App\Utility\Functions;
 
-if (!Functions::checkPermissions(['manager'])) {
+
+
+if ($_GET['page'] === 'medewerkers.index') {
+    header("Location: ?page=home");
+}
+
+if (!Functions::checkPermissions(['manager', 'beheerder'])) {
     header("Location: ?page=home");
 }

@@ -3,6 +3,7 @@
 use App\Utility\Database;
 use App\Utility\Functions;
 use App\Utility\DataProcessor;
+use App\Utility\Session;
 
 
 
@@ -21,4 +22,5 @@ WHERE personeel.id = :id;
     'id' => $medewerker_id
 ]);
 
+Session::set('medewerkers.success', "De medewerker is verwijderd.");
 Functions::jsRedirect(url: '?page=medewerkers');

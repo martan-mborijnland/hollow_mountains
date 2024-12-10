@@ -14,7 +14,7 @@ return [
 		'password' => [
 			'salt' => "PASSWORD_SALT",
 			'pepper' => "PASSWORD_PEPPER",
-			'algorithm'=> 'CRYPT_SHA256'
+			'algorithm'=> CRYPT_SHA256
 		]
 	]
 ];

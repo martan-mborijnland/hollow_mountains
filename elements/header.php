@@ -6,6 +6,7 @@
         <li><a href="?page=home">home</a></li>
         <li><a href="?page=medewerkers.overzicht">medewerkers</a></li>
         <li><a href="?page=attracties.overzicht">attracties</a></li>
+        <li><a href="?page=onderhoud.overzicht">onderhoud</a></li>
     <?php if ($_SESSION['loggedIn'] === true): ?>
         <li><a href="?page=logout">logout</a></li>
     <?php else: ?>

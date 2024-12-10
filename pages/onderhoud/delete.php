@@ -3,7 +3,7 @@
 use App\Utility\Database;
 use App\Utility\Functions;
 use App\Utility\DataProcessor;
-use App\Utility\Session;
+
 
 
 if (!isset($_GET['id'])) {
@@ -21,5 +21,4 @@ WHERE attractie.id = :id;
     'id' => $attractie_id
 ]);
 
-Session::set('attracties.success', "De attractie is verwijderd.");
 Functions::jsRedirect(url: '?page=attracties.overzicht');

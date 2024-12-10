@@ -3,7 +3,21 @@
 use App\Utility\Database;
 use App\Utility\Functions;
 use App\Utility\DataProcessor;
+use App\Utility\Session;
 
+
+
+Functions::displayError(message: Session::get('medewerkers.error'));
+Session::delete('medewerkers.error');
+
+Functions::displaySuccess(message: Session::get('medewerkers.success'));
+Session::delete('medewerkers.success');
+
+
+Functions::drawSidebar(options: [ 
+    ['label' => 'Overzicht', 'page' => 'medewerkers.overzicht'],
+    ['label' => 'Add', 'page' => 'medewerkers.add']
+]);
 
 
 if (!isset($_GET['id'])) {
@@ -31,15 +45,17 @@ if (empty($medewerker)) {
 }
 
 $medewerker['acties'] = "
-    <a href='?page=medewerkers.editen&id=" . $medewerker['id'] . "'>Edit</a>
+    <a href='?page=medewerkers.edit&id=" . $medewerker['id'] . "'>Edit</a>
     <a href='?page=medewerkers.delete&id=" . $medewerker['id'] . "'>Delete</a>
 ";
 
+echo "<section>";
 echo "<a href='?page=medewerkers.overzicht'>ga terug...</a>";
 Functions::drawTable(
     headers: ['gebruikersnaam', 'naam', 'adres', 'rol_naam', 'acties'],
     rows: [$medewerker],
     direction: 'vertical'
 );
+echo "</section>";
 
 ?>

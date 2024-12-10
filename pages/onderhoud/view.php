@@ -11,16 +11,8 @@ if (!isset($_GET['id'])) {
     Functions::jsRedirect(url: '?page=attracties.overzicht');
 }
 
-Functions::drawSidebar(options: [
-    ['label' => 'Overzicht', 'page' => 'attracties.overzicht'],
-    ['label' => 'Add', 'page' => 'attracties.add']
-]);
-
 Functions::displayError(message: Session::get('attracties.error'));
 Session::delete('attracties.error');
-
-Functions::displaySuccess(message: Session::get('attracties.success'));
-Session::delete('attracties.success');
 
 $database = Database::getInstance();
 
@@ -42,12 +34,12 @@ if (empty($attractie)) {
     Functions::jsRedirect(url: '?page=attracties.overzicht');
 }
 
-$attractie['specificaties'] = "<pre>" . $attractie['specificaties'] . "</pre>";
-$attractie['foto'] = $attractie['foto'] ? '<img src="' . $attractie['foto'] . '" />' : '<img src="websrc/images/no_image.jpg">';
 $attractie['acties'] = "
     <a href='?page=attracties.edit&id=" . $attractie['id'] . "'>Edit</a>
     <a href='?page=attracties.delete&id=" . $attractie['id'] . "'>Delete</a>
 ";
+$attractie['foto'] = $attractie['foto'] ? '<img src="' . $attractie['foto'] . '" />' : '<img src="websrc/images/no_image.jpg">';
+
 
 echo "<section>";
 echo "<a href='?page=attracties.overzicht'>ga terug...</a>";
