@@ -3,7 +3,7 @@
 return [
     'db' => [
         'host' => 'localhost',
-        'dbname' => '',
+        'dbname' => 'DBNAME',
         'username' => 'root',
         'password' => '',
         'driver' => 'mysql',
@@ -12,8 +12,8 @@ return [
 
 	'Security' => [
 		'password' => [
-			'salt' => "PASSWORD_SALT",
-			'pepper' => "PASSWORD_PEPPER",
+			'salt' => "xxxxxxxxxxxxxxxx",
+			'pepper' => "xxxxxxxxxxxxxxxx",
 			'algorithm'=> 'CRYPT_SHA256'
 		]
 	]

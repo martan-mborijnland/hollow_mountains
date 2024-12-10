@@ -101,9 +101,27 @@ class DataProcessor
     {
 		$pepper = Configuration::read('Security.password.pepper');
 		$salt = Configuration::read('Security.password.salt');
-		$encryption = Configuration::read('Security.password.encryption');
+		$algorithm = Configuration::read('Security.password.algorithm');
 
-        $hash = password_hash($pepper . $password . $salt, $encryption);
+        $hash = password_hash($pepper . $password . $salt, $algorithm);
         return $hash;
+    }
+
+    /**
+     *	@param string $password
+     *	@param string $hash
+     *
+     *	@return bool
+     *
+     *	Checks if the given $password matches the given $hash.
+     *	It uses the same pepper, salt and encryption method as hashPassword()
+     *	to generate a hash from $password and then compares it with $hash.
+     */
+    public static function checkPassword(string $password, string $hash): bool
+    {
+		$pepper = Configuration::read('Security.password.pepper');
+		$salt = Configuration::read('Security.password.salt');
+
+        return password_verify($pepper . $password . $salt, $hash);
     }
 }

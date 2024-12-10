@@ -1,3 +1,10 @@
 /vendor/
-*.local.*
 *.lock
+
+*.local.*
+!*.local.example.*
+
+/websrc/*
+!/websrc/images/no_image.jpg
+
+!*.gitkeep
