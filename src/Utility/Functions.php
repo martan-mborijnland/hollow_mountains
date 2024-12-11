@@ -14,13 +14,18 @@ class Functions
 {
     public static function checkPermissions(array $permissions): bool
     {
-        return in_array(Session::get('user')['rol'], $permissions);
+        try {
+            return in_array(Session::get('user')['rol'], $permissions);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public static function jsRedirect(string $url): void
     {
         echo "<script>window.location.href = '" . $url . "'</script>";
         echo "Als je dit ziet, ga je naar: <a href='" . $url . "'>" . $url . "</a>";
+        die();
     }
 
     public static function drawTable($headers, $rows, $direction='horizontal'): void
@@ -31,24 +36,41 @@ class Functions
                 echo "<th>". str_replace('_', ' ', ucfirst($header)) ."</th>";
             }
             echo "</tr></thead><tbody>";
-            foreach ($rows as $row) {    
-                echo "<tr>";
-                foreach ($headers as $header) {
-                    echo "<td>". $row[$header] ."</td>";
-                }
-                echo "</tr>";
-            }
-            echo "</tbody></table>";
-        } else if ($direction === 'vertical') {
-            echo "<table><thead>";
-            foreach ($rows as $row) {
-                foreach ($headers as $header) {
+            
+            if (empty($rows)) {
+                echo "<tr><td colspan=\"" . count($headers) . "\">No data available</td></tr>";
+            } else {
+                foreach ($rows as $row) {    
                     echo "<tr>";
-                    echo "<th>". str_replace('_', ' ', ucfirst($header)) ."</th>";
-                    echo "<td>".  $row[$header] ."</td>";
+                    foreach ($headers as $header) {
+                        echo "<td>". $row[$header] ."</td>";
+                    }
                     echo "</tr>";
                 }
             }
+            
+            echo "</tbody></table>";
+        } else if ($direction === 'vertical') {
+            echo "<table><tbody>";
+            
+            if (empty($rows)) {
+                foreach ($headers as $header) {
+                    echo "<tr>";
+                    echo "<th>". str_replace('_', ' ', ucfirst($header)) ."</th>";
+                    echo "<td>No data available</td>";
+                    echo "</tr>";
+                }
+            } else {
+                foreach ($rows as $row) {
+                    foreach ($headers as $header) {
+                        echo "<tr>";
+                        echo "<th>". str_replace('_', ' ', ucfirst($header)) ."</th>";
+                        echo "<td>". $row[$header] ."</td>";
+                        echo "</tr>";
+                    }
+                }
+            }
+            
             echo "</tbody></table>";
         }
     }

@@ -7,6 +7,6 @@ if ($_GET['page'] === 'attracties.index') {
     header("Location: ?page=home");
 }
 
-if (!Functions::checkPermissions(['beheerder', 'manager', 'monteur'])) {
+if (!Functions::checkPermissions(['beheerder', 'manager'])) {
     header("Location: ?page=home");
 }

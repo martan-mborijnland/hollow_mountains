@@ -50,7 +50,6 @@ $medewerker['acties'] = "
 ";
 
 echo "<section>";
-echo "<a href='?page=medewerkers.overzicht'>ga terug...</a>";
 Functions::drawTable(
     headers: ['gebruikersnaam', 'naam', 'adres', 'rol_naam', 'acties'],
     rows: [$medewerker],

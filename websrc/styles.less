@@ -86,6 +86,29 @@ header {
     }
 }
 
+main#home {
+    display: grid;
+    grid-template-rows: 75% 1fr;
+
+    .cover-image {
+        width: 100%;
+        background-image: url('images/cover-image.jpg');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        background-position: right bottom;
+    }
+
+    .text {
+        border-top: 1px solid #fff;
+        color: #fff;
+        background-color: @primary-color;
+
+        width: 100%;
+        text-align: center;
+        padding: 16px;
+    }
+}
+
 main.has-sidebar {
     display: grid !important;
     grid-template-columns: 200px 1fr !important;
@@ -139,7 +162,11 @@ main#login {
     }
 }
 
-main#medewerkers-overzicht, main#attracties-overzicht, main#onderhoud-overzicht {
+main#medewerkers-overzicht, 
+main#attracties-overzicht, 
+main#onderhoudstaak-overzicht, 
+main#onderhoud-overzicht,
+main#onderhoud-overzichtDagelijks {
     a {
         color: #000;
         text-decoration: underline;
@@ -175,7 +202,90 @@ main#medewerkers-overzicht, main#attracties-overzicht, main#onderhoud-overzicht 
     }
 }
 
-main#medewerkers-view, main#attracties-view {
+main#onderhoud-overzicht,
+main#onderhoud-overzichtDagelijks {
+    section {
+        table {
+            margin-top: 1rem;
+        }
+
+        .form-wrapper {
+            height: 200px;
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            form {
+                width: 70%;
+
+                display: grid;
+                grid-template-columns: 1fr 100px;
+
+                background: @secondary-color;
+
+                padding: 16px 32px;
+                border-radius: 8px;
+
+
+                > div {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-evenly;
+                    align-items: center;
+                }
+
+                > div.button-wrapper {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-evenly;
+                    gap: 8px;
+
+                    > input, button, a {
+                        width: 100%;
+                    }
+                }
+
+                &, * {
+                    color: white;
+                    font-size: 1rem;
+                }
+
+                a {
+                    text-decoration: none;
+
+                    &:hover {
+                        text-shadow: none;
+                    }
+                }
+
+                input, button, select, a, option {
+                    color: #000;
+                    padding: 5px 10px;
+        
+                    outline: 1px solid @primary-color;
+                    border-radius: 8px;
+
+                    background: white;
+                    
+                    &:hover {   
+                        background: #fffd;
+                    }
+                }
+
+                button:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}
+
+main#medewerkers-view, 
+main#attracties-view, 
+main#onderhoudstaak-view, 
+main#onderhoud-view {
     a {
         color: #000;
         text-decoration: underline;
@@ -189,7 +299,7 @@ main#medewerkers-view, main#attracties-view {
 
     table {
         border-collapse: collapse;
-        margin: 100px auto 0 auto;
+        margin: 100px auto;
 
         width: 70%;
         min-width: auto;
@@ -211,7 +321,95 @@ main#medewerkers-view, main#attracties-view {
     }
 }
 
-main#medewerkers-edit, main#medewerkers-add, main#attracties-edit, main#attracties-add {
+main#onderhoud-view {
+    width: 100%;
+
+    table {
+        margin-bottom: 0;
+    }
+
+    .comments {
+        width: 70%;
+        margin: auto;
+    
+        a {
+            color: white;
+        }
+
+        .comment-form {
+            margin: 1rem 0;
+            background-color: @secondary-color;
+
+            form {
+                padding: 16px;
+                display: flex;
+                flex-direction: column;
+
+                textarea, input {
+                    padding: 8px;
+
+                    outline: 1px solid @primary-color;
+                    border-radius: 8px;
+                }
+
+                textarea {
+                    border: none;
+                    margin: 0 0 @input-margin-bottom 0;
+
+                    resize: none;
+                    height: 200px;
+                }
+            }
+        }
+        
+        .comment-section {
+            margin: 1rem 0;
+
+            .comment {
+                background-color: @secondary-color;
+                padding: 8px 16px;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+
+                display: grid;
+                grid-template-rows: 1rem 1fr 1rem;
+                gap: 0.5rem;
+
+                color: #fff;
+
+                .comment-header {
+                    display: grid;
+                    grid-template-columns: 1fr 1rem;
+                }
+
+                .comment-personeel {
+                    font-size: 0.8rem;
+                }
+
+                .comment-text {
+                    margin-bottom: 8px;
+                }
+
+                .comment-date {
+                    font-size: 0.8rem;
+                    text-align: right;
+                }
+
+                .delete-button {
+                    cursor: pointer;
+                    background: none;
+                    color: white;
+                    font-size: 1rem;
+                }
+            }
+        }
+    }
+}
+
+main#medewerkers-edit, main#medewerkers-add, 
+main#attracties-edit, main#attracties-add, 
+main#onderhoudstaak-edit, main#onderhoudstaak-add, 
+main#onderhoud-edit, main#onderhoud-add {
     form {
         width: 400px;
         margin: 32px 0 0 32px;
@@ -249,7 +447,8 @@ main#attracties-overzicht {
     }
 }
 
-main#attracties-view {
+main#attracties-view, 
+main#onderhoud-view {
     img {
         width: 400px;
         height: 400px;
@@ -257,11 +456,9 @@ main#attracties-view {
     }
 }
 
-main#attracties-edit, main#attracties-add {
-    input[type="file"] {
-        display: none;
-    }
-
+main#attracties-edit, main#attracties-add, 
+main#onderhoudstaak-edit, main#onderhoudstaak-add, 
+main#onderhoud-edit, main#onderhoud-add {
     textarea {
         outline: 1px solid @primary-color;
         border-radius: 8px;
@@ -276,6 +473,12 @@ main#attracties-edit, main#attracties-add {
         &:hover {
             background: #0001;
         }
+    }
+}
+
+main#attracties-edit, main#attracties-add {
+    input[type="file"] {
+        display: none;
     }
 
     .foto-display {

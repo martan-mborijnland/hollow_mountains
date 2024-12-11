@@ -56,6 +56,60 @@ switch ($_POST['action']) {
 
         break;
 
+    case 'updateOnderhoudstaak':
+        if (Functions::checkPermissions(['beheerder'])) {
+            $formHandler->updateOnderhoudstaak();
+        } else {
+            header("Location: ?page=home");
+        }
+
+        break;
+
+    case 'addOnderhoudstaak':
+        if (Functions::checkPermissions(['beheerder'])) {
+            $formHandler->addOnderhoudstaak();
+        } else {
+            header("Location: ?page=home");
+        }
+
+        break;
+
+    case 'editOnderhoud':
+        if (Functions::checkPermissions(['beheerder', 'manager', 'monteur'])) {
+            $formHandler->editOnderhoud();
+        } else {
+            header("Location: ?page=home");
+        }
+
+        break;
+
+    case 'addOnderhoud':
+        if (Functions::checkPermissions(['beheerder', 'manager', 'monteur'])) {
+            $formHandler->addOnderhoud();
+        } else {
+            header("Location: ?page=home");
+        }
+
+        break;
+
+    case 'addComment':
+        if (Functions::checkPermissions(['beheerder', 'manager', 'monteur'])) {
+            $formHandler->addComment();
+        } else {
+            header("Location: ?page=home");
+        }
+
+        break;
+    
+    case 'deleteComment':
+        if (Functions::checkPermissions(['beheerder', 'manager', 'monteur'])) {
+            $formHandler->deleteComment();
+        } else {
+            header("Location: ?page=home");
+        }
+
+        break;
+
     default:
         header("Location: ?page=home");
         break;

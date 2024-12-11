@@ -25,7 +25,7 @@ class FormHandler
             $sanatizedPOST = DataProcessor::sanitizeData($_POST);
 
             $query = "
-                SELECT personeel.naam, personeel.gebruikersnaam, personeel.wachtwoord, rol.naam AS rol
+                SELECT personeel.id, personeel.naam, personeel.gebruikersnaam, personeel.wachtwoord, rol.naam AS rol
                     FROM personeel
                     INNER JOIN rol ON rol.id = personeel.rol_id
                     WHERE gebruikersnaam = :username 
@@ -153,7 +153,7 @@ class FormHandler
                 'id' => $sanatizedPOST['id']
             ])->fetch(PDO::FETCH_ASSOC);
 
-            if (isset($_FILES['foto'])) {
+            if (isset($_FILES['foto']) && $_FILES['foto']['size'] > 0) {
                 if ($_FILES['foto']['error'] != 0) {
                     Session::set('attracties.error', 'Invalid image file.');
                     header("Location: ?page=attracties.overzicht");
@@ -200,7 +200,7 @@ class FormHandler
             Session::set('attracties.success', "De attractie is gewijzigd.");
             header("Location: ?page=attracties.view&id=" . $sanatizedPOST['id']);
         } catch (\Exception $e) {
-            Session::set('medewerkers.error', $e->getMessage());
+            Session::set('attracties.error', $e->getMessage());
             header("Location: ?page=attracties.view&id=" . $sanatizedPOST['id']);
         }
     }
@@ -254,6 +254,219 @@ class FormHandler
         } catch (\Exception $e) {
             Session::set('attracties.error', $e->getMessage());
             header("Location: ?page=attracties.overzicht");
+        }
+    }
+    public function updateOnderhoudstaak(): void
+    {
+        try {
+            $sanatizedPOST = DataProcessor::sanitizeData($_POST);
+
+            if (!DataProcessor::validateFields($sanatizedPOST, ['id', 'naam', 'beschrijving', 'attractie_id', 'start_datum', 'duur_dagen', 'herhaling_dagen'])) {
+                Session::set('onderhoud.error', 'Required fields not found.');
+                header("Location: ?page=onderhoud.overzicht");
+                exit();
+            }
+
+            $query = "
+                UPDATE onderhoudstaak
+                    SET naam = :naam, beschrijving = :beschrijving, attractie_id = :attractie_id, start_datum = :start_datum, duur_dagen = :duur_dagen, herhaling_dagen = :herhaling_dagen
+                    WHERE id = :id;
+            ";
+            $params = [
+                'naam' => $sanatizedPOST['naam'],
+                'beschrijving' => $sanatizedPOST['beschrijving'],
+                'attractie_id' => $sanatizedPOST['attractie_id'],
+                'start_datum' => $sanatizedPOST['start_datum'],
+                'duur_dagen' => $sanatizedPOST['duur_dagen'],
+                'herhaling_dagen' => $sanatizedPOST['herhaling_dagen'],
+                'id' => $sanatizedPOST['id']
+            ];
+
+            $result = $this->database->query($query, $params);
+
+            Session::set('onderhoudstaak.success', "De onderhoudstaak is gewijzigd.");
+            header("Location: ?page=onderhoudstaak.view&id=" . $sanatizedPOST['id']);
+        } catch (\Exception $e) {
+            Session::set('onderhoudstaak.error', $e->getMessage());
+            header("Location: ?page=onderhoudstaak.view&id=" . $sanatizedPOST['id']);
+        }
+    }
+
+    public function addOnderhoudstaak(): void
+    {
+        try {
+            $sanatizedPOST = DataProcessor::sanitizeData($_POST);
+
+            if (!DataProcessor::validateFields($sanatizedPOST, ['naam', 'beschrijving', 'attractie_id', 'start_datum', 'duur_dagen', 'herhaling_dagen'])) {
+                Session::set('onderhoudstaak.error', 'Required fields not found.');
+                header("Location: ?page=onderhoudstaak.overzicht");
+                exit();
+            }
+
+            $query = "
+                INSERT INTO onderhoudstaak (naam, beschrijving, attractie_id, start_datum, duur_dagen, herhaling_dagen)
+                    VALUES (:naam, :beschrijving, :attractie_id, :start_datum, :duur_dagen, :herhaling_dagen);
+            ";
+            $params = [
+                'naam' => $sanatizedPOST['naam'],
+                'beschrijving' => $sanatizedPOST['beschrijving'],
+                'attractie_id' => $sanatizedPOST['attractie_id'],
+                'start_datum' => $sanatizedPOST['start_datum'],
+                'duur_dagen' => $sanatizedPOST['duur_dagen'],
+                'herhaling_dagen' => $sanatizedPOST['herhaling_dagen']
+            ];
+
+            $result = $this->database->query($query, $params);
+
+            Session::set('onderhoudstaak.success', "De onderhoudstaak is toegevoegd.");
+            header("Location: ?page=onderhoudstaak.overzicht");
+        } catch (\Exception $e) {
+            Session::set('onderhoudstaak.error', $e->getMessage());
+            header("Location: ?page=onderhoudstaak.overzicht");
+        }
+    }
+
+    public function editOnderhoud(): void
+    {
+        try {
+            $sanatizedPOST = DataProcessor::sanitizeData($_POST);
+
+            if (!isset($sanatizedPOST['type']) || !in_array($sanatizedPOST['type'], ['status', 'personeel'])) {
+                Session::set('onderhoud.error', "Ongeldig edit type.");
+                header("Location: ?page=onderhoud.overzicht");
+            }
+
+            $query = "
+                UPDATE onderhoud
+                    SET ". $sanatizedPOST['type'] ."_id = :type_id
+                    WHERE id = :id;
+            ";
+            $params = [
+                'type_id' => $sanatizedPOST[$sanatizedPOST['type'] ."_id"],
+                'id' => $sanatizedPOST['id']
+            ];
+
+            $result = $this->database->query($query, $params);
+
+            Session::set('onderhoud.success', "De onderhoud is gewijzigd.");
+            header("Location: ?page=onderhoud.overzicht");
+        } catch (\Exception $e) {
+            Session::set('onderhoud.error', $e->getMessage());
+            header("Location: ?page=onderhoud.overzicht");
+        }
+    }
+
+    public function addOnderhoud(): void
+    {
+        try {
+            $sanatizedPOST = DataProcessor::sanitizeData($_POST);
+
+            if (!DataProcessor::validateFields($sanatizedPOST, ['onderhoudstaak_id', 'personeel_id'])) {
+                Session::set('onderhoud.error', 'Required fields not found.');
+                header("Location: ?page=onderhoud.overzicht");
+                exit();
+            }
+
+            $query = "
+                INSERT INTO onderhoud (onderhoudstaak_id, personeel_id)
+                    VALUES (:onderhoudstaak_id, :personeel_id);
+            ";
+            $params = [
+                'onderhoudstaak_id' => $sanatizedPOST['onderhoudstaak_id'],
+                'personeel_id' => $sanatizedPOST['personeel_id']
+            ];
+
+            $result = $this->database->query($query, $params);
+
+            Session::set('onderhoud.success', "De onderhoud is toegevoegd.");
+            header("Location: ?page=onderhoud.overzicht");
+        } catch (\Exception $e) {
+            Session::set('onderhoud.error', $e->getMessage());
+            header("Location: ?page=onderhoud.overzicht");
+        }
+    }
+
+    public function addComment(): void
+    {
+        try {
+            $sanatizedPOST = DataProcessor::sanitizeData($_POST);
+
+            if (!DataProcessor::validateFields($sanatizedPOST, ['onderhoudstaak_id', 'opmerking'])) {
+                Session::set('onderhoud.error', 'Required fields not found.');
+                header("Location: ?page=onderhoud.view&id=" . $sanatizedPOST['onderhoudstaak_id']);
+                exit();
+            }
+
+            $personeel_id = Session::get('user')['id'];
+
+            $query = "
+                INSERT INTO onderhoudstaak_opmerking (onderhoudstaak_id, personeel_id, opmerking)
+                    VALUES (:onderhoudstaak_id, :personeel_id, :opmerking);
+            ";
+            $params = [
+                'onderhoudstaak_id' => $sanatizedPOST['onderhoudstaak_id'],
+                'personeel_id' => $personeel_id,
+                'opmerking' => $sanatizedPOST['opmerking']
+            ];
+
+            $result = $this->database->query($query, $params);
+
+            Session::set('onderhoud.success', "De opmerking is toegevoegd.");
+            header("Location: ?page=onderhoud.view&id=" . $sanatizedPOST['onderhoudstaak_id']);
+        } catch (\Exception $e) {
+            Session::set('onderhoud.error', $e->getMessage());
+            header("Location: ?page=onderhoud.view&id=" . $sanatizedPOST['onderhoudstaak_id']);
+        }
+    }
+
+    public function deleteComment(): void
+    {
+        try {
+            $sanatizedPOST = DataProcessor::sanitizeData($_POST);
+
+            $row = $this->database->query("
+                SELECT personeel_id
+                    FROM onderhoudstaak_opmerking
+                    WHERE id = :onderhoudstaak_opmerking_id;
+            ", [
+                'onderhoudstaak_opmerking_id' => $sanatizedPOST['onderhoudstaak_opmerking_id']
+            ])->fetch(PDO::FETCH_ASSOC);
+            if (!Functions::checkPermissions(['beheerder', 'manager'])) {
+                if ($row['personeel_id'] != Session::get('user')['id']) {
+                    Session::set('onderhoud.error', 'You are not allowed to delete this comment.');
+                    header("Location: ?page=onderhoud.view&id=" . $sanatizedPOST['onderhoudstaak_id']);
+                    exit();
+                }
+            }
+
+            if (!DataProcessor::validateFields($sanatizedPOST, ['onderhoudstaak_opmerking_id'])) {
+                Session::set('onderhoud.error', 'Required fields not found.');
+                header("Location: ?page=onderhoud.view&id=" . $sanatizedPOST['onderhoudstaak_id']);
+                exit();
+            }
+
+            $query = "
+                DELETE FROM onderhoudstaak_opmerking
+                    WHERE id = :onderhoudstaak_opmerking_id;
+            ";
+            $params = [
+                'onderhoudstaak_opmerking_id' => $sanatizedPOST['onderhoudstaak_opmerking_id']
+            ];
+
+            $result = $this->database->query($query, $params);
+            
+            if ($result->rowCount() > 0) {
+                Session::set('onderhoud.success', "De opmerking is verwijderd.");
+                header("Location: ?page=onderhoud.view&id=" . $sanatizedPOST['onderhoudstaak_id']);
+                exit();
+            } else {
+                Session::set('onderhoud.error', "Geen opmerking verwijderd.");
+                header("Location: ?page=onderhoud.view&id=" . $sanatizedPOST['onderhoudstaak_id']);
+                exit();
+            }
+        } catch (\Exception $e) {
+            Session::set('onderhoud.error', $e->getMessage());
+            header("Location: ?page=onderhoud.view&id=" . $sanatizedPOST['onderhoudstaak_id']);
         }
     }
 }

@@ -6,55 +6,87 @@ use App\Utility\DataProcessor;
 
 
 
-if (!isset($_GET['id'])) {
-    Functions::jsRedirect(url: '?page=attracties.overzicht');
+if (!isset($_GET['type']) || !isset($_GET['id'])) {
+    Functions::jsRedirect(url: '?page=onderhoud.overzicht');
 }
+
+$onderhoud_type = DataProcessor::sanitizeData(data: $_GET['type']);
+switch ($onderhoud_type):
+    case 'personeel':
+        $redirect = !Functions::checkPermissions(permissions: ['manager', 'beheerder']);
+        break;
+    case 'status':
+        $redirect = false;
+        break;
+    default:
+        $redirect = true;
+        break;
+endswitch;
+
+
+if ($redirect) {
+    Functions::jsRedirect(url: '?page=onderhoud.overzicht');
+    die();
+}
+
+Functions::drawSidebar(options: [
+    ['label' => 'Overzicht', 'page' => 'onderhoud.overzicht'],
+    ['label' => 'Add', 'page' => 'onderhoud.add']
+]);
+
 
 $database = Database::getInstance();
 
-$attractie_id = DataProcessor::sanitizeData(data: $_GET['id']);
+$onderhoud_id = DataProcessor::sanitizeData(data: $_GET['id']);
 
-$query_attractie = $database->query(query: "
-SELECT attractie.id, attractie.naam, attractie.locatie, attractie.foto, attractie.specificaties,
-        attractie_type.naam AS type_naam, attractie_type.id AS type_id
-    FROM attractie
-    INNER JOIN attractie_type ON attractie_type.id = attractie.type_id
-    WHERE attractie.id = :id;
+$query_onderhoud = $database->query(query: "
+SELECT o.id, o.status_id, o.personeel_id
+FROM onderhoud o
+INNER JOIN onderhoudstaak ot ON ot.id = o.onderhoudstaak_id
+INNER JOIN attractie a ON a.id = ot.attractie_id
+WHERE o.id = :id;
 ", params: [
-    'id' => $attractie_id
+    'id' => $onderhoud_id
 ]);
 
-$attractie = $query_attractie->fetch(PDO::FETCH_ASSOC);
+$onderhoud = $query_onderhoud->fetch(PDO::FETCH_ASSOC);
 
-$query_typen = $database->query(query: "
+$extra_data = [];
+
+$query_personeel = $database->query(query: "
 SELECT * 
-    FROM attractie_type;
+    FROM personeel;
 ");
-$typen = $query_typen->fetchAll(PDO::FETCH_ASSOC);
+$extra_data['personeel'] = $query_personeel->fetchAll(PDO::FETCH_ASSOC);
 
-if (empty($attractie)) {
-    Functions::jsRedirect(url: '?page=attracties.overzicht');
+$query_status = $database->query(query: "
+SELECT * 
+    FROM status;
+");
+$extra_data['status'] = $query_status->fetchAll(PDO::FETCH_ASSOC);
+
+if (empty($onderhoud)) {
+    Functions::jsRedirect(url: '?page=onderhoudstaak.overzicht');
 }
 
 ?>
 
 <form action='?page=formHandler' method='post' enctype="multipart/form-data">
-    <input type='hidden' name='action' value='updateAttractie'>
-    <input type='hidden' name='id' value='<?= $attractie['id'] ?>'>
-    <label for="foto">Foto</label>
-    <label for="foto" class="foto-display" style="background-image: url('<?= $attractie['foto'] ? $attractie['foto'] : 'websrc/images/no_image.jpg' ?>');"></label>
-    <input type="file" id="foto" name="foto" accept="image/*">
-    <label for="naam">Naam</label>
-    <input type='text' name='naam' value='<?= $attractie['naam'] ?>' minlength="0" maxlength="64">
-    <label for="naam">Locatie</label>
-    <input type='text' name='locatie' value='<?= $attractie['locatie'] ?>' minlength="0" maxlength="128">
-    <label for="naam">Specificaties</label>
-    <textarea name="specificaties" minlength="0" maxlength="256"><?= $attractie['specificaties'] ?></textarea>
-    <label for="naam">type</label>
-    <select name='type_id'>
-        <?php foreach ($typen as $type): ?>
-            <option value="<?= $type['id'] ?>" <?= $type['id'] == $attractie['type_id'] ? 'selected' : '' ?>><?= $type['naam'] ?></option>
-        <?php endforeach; ?>
-    </select>
+    <input type='hidden' name='action' value='editOnderhoud'>
+    <input type='hidden' name='type' value='<?= $onderhoud_type ?>'>
+    <input type='hidden' name='id' value='<?= $onderhoud['id'] ?>'>
+<?php
+    $type_id = $onderhoud_type ."_id";
+    $selection = $extra_data[$onderhoud_type];
+
+    echo "
+        <label for='". $type_id ."'>". ucfirst($onderhoud_type) ."</label>
+        <select name='". $type_id ."'>
+    ";
+    foreach ($selection as $selection_) {
+        echo "<option value='". $selection_['id'] ."' ". ($selection_['id'] == $onderhoud[$type_id] ? 'selected' : '') .">". $selection_['naam'] ."</option>";
+    }
+    echo "</select>";
+?>
     <input type='submit' value='Update'>
 </form>

@@ -5,39 +5,29 @@ use App\Utility\DataProcessor;
 use App\Utility\Functions;
 use App\Utility\Session;
 
-
-$filters = [
-    'datum' => ['sd', 'ed'], 
-    'status' => ['s'],
-    'today' => ['today']
-];
-
+// Display any errors or success messages
 Functions::displayError(message: Session::get('onderhoud.error'));
 Session::delete('onderhoud.error');
 
 Functions::displaySuccess(message: Session::get('onderhoud.success'));
 Session::delete('onderhoud.success');
 
-
-
-if (!Functions::checkPermissions(permissions: ['manager', 'beheerder'])) {
-    Functions::drawSidebar(options: [
-        ['label' => 'Overzicht', 'page' => 'onderhoud.overzicht']
-    ]);
-} else {
-    Functions::drawSidebar(options: [
-        ['label' => 'Overzicht', 'page' => 'onderhoud.overzicht'],
-        ['label' => 'Add', 'page' => 'onderhoud.add']
-    ]);
+// Ensure the user has the 'monteur' role
+if (!Functions::checkPermissions(permissions: ['monteur'])) {
+    die('Access denied');
 }
 
+Functions::drawSidebar(options: [
+    ['label' => 'Overzicht', 'page' => 'onderhoud.overzicht']
+]);
 
 $database = Database::getInstance();
+$today = date('Y-m-d');
 
 $params = [];
 $query = "
 SELECT o.id, 
-        ot.beschrijving, ot.start_datum, ot.duur_dagen, ot.duur_dagen, ot.herhaling_dagen,
+        ot.beschrijving, ot.start_datum, ot.duur_dagen, ot.herhaling_dagen,
         p.naam AS medewerker, p.id AS medewerker_id,
         s.naam AS status,
         r.naam AS rol,
@@ -48,57 +38,31 @@ INNER JOIN personeel p ON p.id = o.personeel_id
 INNER JOIN status s ON s.id = o.status_id
 INNER JOIN attractie a ON a.id = ot.attractie_id
 INNER JOIN rol r ON r.id = p.rol_id
+WHERE p.id = :medewerker_id
+AND (ot.start_datum = :today 
+    OR (ot.herhaling_dagen IS NOT NULL AND (DATEDIFF(:today, ot.start_datum) % ot.herhaling_dagen = 0)))
+ORDER BY FIELD(s.naam, 'Niet Gestart', 'In Behandeling', 'Voltooid')
 ";
 
-// Build the WHERE clause based on filters
-$whereClauses = [];
-if (!empty($_GET['sd']) && !empty($_GET['ed'])) {
-    $whereClauses[] = "ot.start_datum >= :start_datum AND ot.start_datum + INTERVAL ot.duur_dagen DAY <= :end_datum";
-    $params['start_datum'] = $_GET['sd'];
-    $params['end_datum'] = $_GET['ed'];
-}
-if (!empty($_GET['s'])) {
-    $whereClauses[] = "s.naam = :status";
-    $params['status'] = $_GET['s'];
-}
-if (Functions::checkPermissions(permissions: ['monteur'])) {
-    $whereClauses[] = "p.id = :medewerker_id";
-    $params['medewerker_id'] = Session::get('user')['id'];
-}
-if (!empty($whereClauses)) {
-    $query .= " WHERE " . implode(" AND ", $whereClauses);
-}
-
-$query .= " ORDER BY FIELD(s.naam, 'Niet Gestart', 'In Behandeling', 'Voltooid')";
-
+$params['medewerker_id'] = Session::get('user')['id'];
+$params['today'] = $today;
 
 $query_onderhoud = $database->query($query, $params);
 $onderhoud = $query_onderhoud->fetchAll(PDO::FETCH_ASSOC);
 
-
-$headers = ['status', 'attractie', 'medewerker', 'rol', 'start_datum', 'eind_datum', 'acties'];
+$headers = ['status', 'attractie', 'beschrijving', 'start_datum', 'eind_datum', 'acties'];
 if (!empty($onderhoud)) {
     $onderhoud = array_map(function($onderhoud_) {
-        if (Functions::checkPermissions(permissions: ['manager', 'beheerder'])) {
-            $onderhoud_['medewerker'] = "<a href='?page=medewerkers.view&id=" . $onderhoud_['medewerker_id'] . "'>" . $onderhoud_['medewerker'] . "</a>";
-            $onderhoud_['attractie'] = "<a href='?page=attracties.view&id=" . $onderhoud_['attractie_id'] . "'>". $onderhoud_['attractie'] ."</a>";
-            $onderhoud_['acties'] = "                
-                <a href='?page=onderhoud.view&id=" . $onderhoud_['id'] . "'>View</a>
-                <a href='?page=onderhoud.edit&type=personeel&id=" . $onderhoud_['id'] . "'>Wijzig medewerker</a>
-                <a href='?page=onderhoud.edit&type=status&id=" . $onderhoud_['id'] . "'>Wijzig status</a>
-                <a href='?page=onderhoud.delete&id=" . $onderhoud_['id'] . "'>Delete</a>
-            ";
-        } else {
-            $onderhoud_['acties'] = "
-                <a href='?page=onderhoud.view&id=" . $onderhoud_['id'] . "'>View</a>
-                <a href='?page=onderhoud.edit&type=status&id=" . $onderhoud_['id'] . "'>Wijzig status</a>
-            ";
-        }  
+        $onderhoud_['eind_datum'] = date('Y-m-d', strtotime($onderhoud_['start_datum'] . ' + ' . $onderhoud_['duur_dagen'] . ' days'));
+        $onderhoud_['acties'] = "
+            <a href='?page=onderhoud.view&id=" . $onderhoud_['id'] . "'>View</a>
+            <a href='?page=onderhoud.edit&type=status&id=" . $onderhoud_['id'] . "'>Wijzig status</a>
+        ";
         return $onderhoud_;
     }, $onderhoud);
 }
-
 ?>
+
 <section>
     <div class="form-wrapper">
         <form method="get" action="">
