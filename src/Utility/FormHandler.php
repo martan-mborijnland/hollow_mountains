@@ -9,16 +9,32 @@ use App\Utility\Session;
 
 
 
+/**
+ * FormHandler
+ * 
+ * @author Martan van Verseveld
+ */
 class FormHandler
 {
     
+    /**
+     * @var Database The database instance used for querying.
+     */
     private Database $database;
-    
+
+    /**
+     * Constructor initializes the database instance.
+     */
     public function __construct()
     {
         $this->database = Database::getInstance();
     }
 
+    /**
+     * Handles user login by validating credentials and setting session data.
+     * 
+     * @return void
+     */
     public function login(): void
     {
         try {
@@ -60,12 +76,22 @@ class FormHandler
         }
     }
 
+    /**
+     * Handles user logout by destroying the session.
+     * 
+     * @return void
+     */
     public function logout(): void
     {
         Session::destroy();
         header("Location: ?page=login");
     }
 
+    /**
+     * Handles medewerker update by validating and updating the database.
+     * 
+     * @return void
+     */
     public function updateMedewerker(): void
     {
         try {
@@ -99,7 +125,11 @@ class FormHandler
             header("Location: ?page=medewerkers.view&id=" . $sanatizedPOST['id']);
         }
     }
-
+    /**
+     * Handles medewerker add by validating and adding the medewerker to the database.
+     * 
+     * @return void
+     */
     public function addMedewerker(): void
     {
         try {
@@ -133,6 +163,11 @@ class FormHandler
         }
     }
 
+    /**
+     * Handles attractie update by validating and updating the attractie in the database.
+     * 
+     * @return void
+     */
     public function updateAttractie(): void
     {
         try {
@@ -205,6 +240,18 @@ class FormHandler
         }
     }
 
+    /**
+     * Adds a new attractie to the database after validating input data and handling image upload.
+     * 
+     * This method sanitizes and validates form input data for required fields: 'naam', 'locatie', 
+     * 'type_id', and 'specificaties'. It then checks the uploaded image for errors and valid file 
+     * types. If successful, the image is uploaded and a new record is inserted into the 'attractie' 
+     * table. On success, a success message is set in the session and the user is redirected to the 
+     * attracties overview page. On failure, an error message is set and the user is redirected to 
+     * the same page.
+     * 
+     * @return void
+     */
     public function addAttractie(): void
     {
         try {
@@ -256,6 +303,18 @@ class FormHandler
             header("Location: ?page=attracties.overzicht");
         }
     }
+
+
+    /**
+     * Updates an existing onderhoudstaak in the database after validating input data.
+     * 
+     * This method sanitizes and validates form input data for required fields: 'id', 'naam', 'beschrijving', 
+     * 'attractie_id', 'start_datum', 'duur_dagen', and 'herhaling_dagen'. It then updates a record in the 'onderhoudstaak' 
+     * table. On success, a success message is set in the session and the user is redirected to the 
+     * onderhoudstaak view page. On failure, an error message is set and the user is redirected to the same page.
+     * 
+     * @return void
+     */
     public function updateOnderhoudstaak(): void
     {
         try {
@@ -292,6 +351,13 @@ class FormHandler
         }
     }
 
+    /**
+     * Adds a new onderhoudstaak to the database after validating input data.
+     * 
+     * This method sanitizes and validates form input data for required fields: 'naam', 'beschrijving', 'attractie_id', 'start_datum', 'duur_dagen', and 'herhaling_dagen'. It then inserts a new record into the 'onderhoudstaak' table. On success, a success message is set in the session and the user is redirected to the onderhoudstaak view page. On failure, an error message is set and the user is redirected to the same page.
+     * 
+     * @return void
+     */
     public function addOnderhoudstaak(): void
     {
         try {
@@ -326,6 +392,13 @@ class FormHandler
         }
     }
 
+    /**
+     * Edits an existing onderhoud in the database after validating input data.
+     * 
+     * This method sanitizes and validates form input data for required fields: 'type', 'type_id', and 'id'. It then updates the 'onderhoud' table with the new data. On success, a success message is set in the session and the user is redirected to the onderhoud overview page. On failure, an error message is set and the user is redirected to the same page.
+     * 
+     * @return void
+     */
     public function editOnderhoud(): void
     {
         try {
@@ -356,6 +429,13 @@ class FormHandler
         }
     }
 
+    /**
+     * Adds a new onderhoud in the database after validating input data.
+     * 
+     * This method sanitizes and validates form input data for required fields: 'onderhoudstaak_id' and 'personeel_id'. It then inserts a new record into the 'onderhoud' table. On success, a success message is set in the session and the user is redirected to the onderhoud overview page. On failure, an error message is set and the user is redirected to the same page.
+     * 
+     * @return void
+     */
     public function addOnderhoud(): void
     {
         try {
@@ -386,6 +466,17 @@ class FormHandler
         }
     }
 
+
+    /**
+     * Adds a new comment to the onderhoudstaak in the database after validating input data.
+     * 
+     * This method sanitizes and validates form input data for required fields: 'onderhoudstaak_id' and 'opmerking'. 
+     * It then inserts a new record into the 'onderhoudstaak_opmerking' table with the current user's personeel_id. 
+     * On success, a success message is set in the session and the user is redirected to the onderhoud view page. 
+     * On failure, an error message is set and the user is redirected to the same page.
+     * 
+     * @return void
+     */
     public function addComment(): void
     {
         try {
@@ -419,6 +510,15 @@ class FormHandler
         }
     }
 
+    /**
+     * Deletes a comment from the onderhoudstaak_opmerking table after validating input data.
+     * 
+     * This method sanitizes and validates form input data for required fields: 'onderhoudstaak_opmerking_id' and 'onderhoudstaak_id'. 
+     * It then checks if the current user has the required permissions to delete the comment. If not, it redirects to the onderhoud view page with an error message.
+     * If successful, a success message is set in the session and the user is redirected to the onderhoud view page. On failure, an error message is set and the user is redirected to the same page.
+     * 
+     * @return void
+     */
     public function deleteComment(): void
     {
         try {
@@ -469,4 +569,5 @@ class FormHandler
             header("Location: ?page=onderhoud.view&id=" . $sanatizedPOST['onderhoudstaak_id']);
         }
     }
+
 }

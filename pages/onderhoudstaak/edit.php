@@ -6,25 +6,29 @@ use App\Utility\DataProcessor;
 
 
 
+// Check if the user has the required permissions to view this page
 if (!Functions::checkPermissions(['beheerder', 'manager'])) {
     Functions::jsRedirect(url: '?page=onderhoudstaak.overzicht');
 }
 
+// Check if the 'id' parameter is set in the GET request
 if (!isset($_GET['id'])) {
     Functions::jsRedirect(url: '?page=onderhoudstaak.overzicht');
 }
 
-
+// Draw the sidebar with navigation options
 Functions::drawSidebar(options: [
     ['label' => 'Overzicht', 'page' => 'onderhoudstaak.overzicht'],
     ['label' => 'Add', 'page' => 'onderhoudstaak.add']
 ]);
 
-
+// Get the database instance
 $database = Database::getInstance();
 
+// Sanitize the 'id' parameter from the GET request
 $onderhoudstaak_id = DataProcessor::sanitizeData(data: $_GET['id']);
 
+// Query to fetch the onderhoudstaak details
 $query_onderhoudstaak = $database->query(query: "
 SELECT ot.id, ot.naam, ot.beschrijving, ot.start_datum, ot.duur_dagen, ot.herhaling_dagen,
        a.naam AS attractie, a.id AS attractie_id
@@ -35,14 +39,18 @@ WHERE ot.id = :id;
     'id' => $onderhoudstaak_id
 ]);
 
+// Fetch the onderhoudstaak details
 $onderhoudstaak = $query_onderhoudstaak->fetch(PDO::FETCH_ASSOC);
 
+// Query to fetch all attracties
 $query_attracties = $database->query(query: "
 SELECT * 
     FROM attractie;
 ");
+// Fetch all attracties
 $attracties = $query_attracties->fetchAll(PDO::FETCH_ASSOC);
 
+// Redirect if no onderhoudstaak found
 if (empty($onderhoudstaak)) {
     Functions::jsRedirect(url: '?page=onderhoudstaak.overzicht');
 }

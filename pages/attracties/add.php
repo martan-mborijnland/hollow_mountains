@@ -6,18 +6,22 @@ use App\Utility\DataProcessor;
 
 
 
+// Draw the sidebar with navigation options for 'Overzicht' and 'Add'
 Functions::drawSidebar(options: [
     ['label' => 'Overzicht', 'page' => 'attracties.overzicht'],
     ['label' => 'Add', 'page' => 'attracties.add']
 ]);
 
-
+// Get the database instance
 $database = Database::getInstance();
 
+// Execute a query to select all rows from the attractie_type table
 $query_typen = $database->query(query: "
 SELECT * 
     FROM attractie_type;
 ");
+
+// Fetch all results as an associative array
 $typen = $query_typen->fetchAll(PDO::FETCH_ASSOC);
 
 ?>

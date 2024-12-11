@@ -1,9 +1,12 @@
 <h1>Login</h1>
 <?php
-if (isset($_SESSION['error'])) {
-    echo '<span class="error">'. $_SESSION['error'] .'</span>';
-    unset($_SESSION['error']);
-}
+
+use App\Utility\Functions;
+use App\Utility\Session;
+
+// Display errors
+Functions::displayError(message: Session::get('login.error'));
+Session::delete('login.error');
 ?>
 <form action="?page=formHandler" method="post" enctype="multipart/form-data">
     <input type="hidden" name="action" value="login">

@@ -8,18 +8,54 @@ use App\Utility\Session;
 use App\Utility\Functions;
 
 
+/**
+ * Class Application
+ *
+ * This class is the main application class for the Hollow Mountains theme park management system.
+ *
+ * @author Martan van Verseveld
+ */
 class Application
 {
+    /**
+     * The current page requested by the user.
+     * Defaults to "home" if not specified.
+     */
     private string $page = "home";
+
+    /**
+     * Instance of the Database class for database interactions.
+     */
     private Database $database;
 
+    /**
+     * Pages that do not require specific elements to be included.
+     */
     private array $ignoreElements = ['logout', 'login'];
+
+    /**
+     * Pages that do not require specific head elements to be included.
+     */
     private array $ignoreHead = ['logout'];
 
+    /**
+     * Pages that can be accessed without logging in.
+     */
     private array $ignoreLoggedIn = ['home', 'login'];
 
 
 
+    /**
+     * Constructor for the Application class.
+     *
+     * This constructor is responsible for:
+     * - Starting the session
+     * - Checking if the user is logged in
+     * - Loading the configuration
+     * - Initializing the database
+     * - Routing the application
+     * - Including the necessary pages
+     */
     public function __construct()
     {
         Configuration::load();
@@ -66,6 +102,15 @@ class Application
     }
 
 
+    /**
+     * Handles the routing of the application.
+     * 
+     * - If `$_GET['page']` is set, it will be used to determine the page to load.
+     * - If the user is not logged in and the page is not in the `$ignoreLoggedIn` array, the user will be redirected to the login page.
+     * - If the user is logged in and the page is the login page, the user will be redirected to the home page.
+     * - If the page contains a dot (`.`), it will be replaced with a slash (`/`) and the page will be loaded from the subdirectory.
+     * - If the page does not exist, a 404 page will be displayed.
+     */
     private function route(): void
     {
         if (isset($_GET['page']) && $_GET['page'] !== '') {
@@ -89,6 +134,10 @@ class Application
         }
     }
 
+    /**
+     * Returns the database instance.
+     * @return Database
+     */
     public function getDatabase(): Database
     {
         return $this->database;

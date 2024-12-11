@@ -85,6 +85,7 @@ Functions::drawTable(
 // echo "</section>";
 
 
+// Query to fetch comments related to the specified onderhoudstaak_id
 $query_comments = $database->query(query: "
 SELECT oto.id, oto.opmerking, oto.created_at,
         p.naam AS personeel_naam, p.id AS personeel_id,
@@ -100,11 +101,15 @@ SELECT oto.id, oto.opmerking, oto.created_at,
     'onderhoudstaak_id' => $onderhoud['onderhoudstaak_id']
 ]);
 
+// Fetch all comments as an associative array
 $comments = $query_comments->fetchAll(PDO::FETCH_ASSOC);
+
+// Ensure $comments is an array even if no results are returned
 if (empty($comments)) {
     $comments = [];
 }
 
+// Add links for manager and beheerder roles to the 'medewerker' field
 if (!empty($comments)) {
     $comments = array_map(function($comment) {
         if (Functions::checkPermissions(permissions: ['manager', 'beheerder'])) {

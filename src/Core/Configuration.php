@@ -2,27 +2,52 @@
 
 namespace App\Core;
 
-
-
+/**
+ * Class Configuration
+ * 
+ * This class handles the loading and reading of configuration settings.
+ * 
+ * @author Martan van Verseveld
+ */
 class Configuration
 {
-	private static $config;
-	
-	public static function load() {
-		$configDir = dirname(dirname(__DIR__)) . "/config/";
-		
-		$config_app = require $configDir . "/app.php";
-		$config_applocal = require $configDir . "/app.local.php";
+    /**
+     * @var array The loaded configuration settings.
+     */
+    private static $config;
 
-		self::$config = array_merge($config_app, $config_applocal);
-	}
+    /**
+     * Loads the configuration settings from files.
+     * 
+     * This method merges configurations from 'app.php' and 'app.local.php'.
+     *
+     * @return void
+     */
+    public static function load(): void
+    {
+        $configDir = dirname(dirname(__DIR__)) . "/config/";
 
-	public static function read(?string $var = null, $default = null) 
-	{
-		$keys = explode('.', $var);
+        $config_app = require $configDir . "/app.php";
+        $config_applocal = require $configDir . "/app.local.php";
 
-		return array_reduce($keys, function ($carry, $key) {
-			return is_array($carry) && isset($carry[$key]) ? $carry[$key] : null;
-		}, self::$config) ?? $default;
-	}
+        self::$config = array_merge($config_app, $config_applocal);
+    }
+
+    /**
+     * Reads a configuration value.
+     * 
+     * This method retrieves a configuration value based on a dot-separated key.
+     *
+     * @param string|null $var The dot-separated configuration key.
+     * @param mixed $default The default value to return if the key is not found.
+     * @return mixed The configuration value or the default value.
+     */
+    public static function read(?string $var = null, $default = null)
+    {
+        $keys = explode('.', $var);
+
+        return array_reduce($keys, function ($carry, $key) {
+            return is_array($carry) && isset($carry[$key]) ? $carry[$key] : null;
+        }, self::$config) ?? $default;
+    }
 }

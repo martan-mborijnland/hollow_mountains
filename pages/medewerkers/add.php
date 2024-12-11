@@ -6,18 +6,22 @@ use App\Utility\DataProcessor;
 
 
 
+// Draw the sidebar with navigation options for 'Overzicht' and 'Add'
 Functions::drawSidebar(options: [ 
     ['label' => 'Overzicht', 'page' => 'medewerkers.overzicht'],
     ['label' => 'Add', 'page' => 'medewerkers.add']
 ]);
 
-
+// Get the database instance
 $database = Database::getInstance();
 
+// Execute a query to select all rows from the rol table
 $query_rollen = $database->query(query: "
 SELECT * 
     FROM rol;
 ");
+
+// Fetch all results as an associative array
 $rollen = $query_rollen->fetchAll(PDO::FETCH_ASSOC);
 
 ?>

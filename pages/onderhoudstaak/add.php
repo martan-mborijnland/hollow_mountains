@@ -6,23 +6,28 @@ use App\Utility\DataProcessor;
 
 
 
+// Check if the user has the necessary permissions to access this page
 if (!Functions::checkPermissions(['beheerder', 'manager'])) {
+    // Redirect to the 'onderhoudstaak.overzicht' page if the user lacks permissions
     Functions::jsRedirect(url: '?page=onderhoudstaak.overzicht');
 }
 
-
+// Draw the sidebar with navigation options for 'Overzicht' and 'Add'
 Functions::drawSidebar(options: [
     ['label' => 'Overzicht', 'page' => 'onderhoudstaak.overzicht'],
     ['label' => 'Add', 'page' => 'onderhoudstaak.add']
 ]);
 
-
+// Get the instance of the database
 $database = Database::getInstance();
 
+// Execute a query to select all rows from the 'attractie' table
 $query_attracties = $database->query(query: "
 SELECT * 
     FROM attractie;
 ");
+
+// Fetch all results as an associative array
 $attracties = $query_attracties->fetchAll(PDO::FETCH_ASSOC);
 
 ?>

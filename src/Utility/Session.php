@@ -7,7 +7,7 @@ use App\Core\Configuration;
 /**
  * Class Session
  *
- * @package App\Utility
+ * @author Martan van Verseveld
  */
 class Session
 {

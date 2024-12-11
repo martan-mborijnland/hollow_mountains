@@ -4,21 +4,24 @@ use App\Utility\Database;
 use App\Utility\Functions;
 use App\Utility\DataProcessor;
 
-
-
+// Redirect if 'id' is not set in GET parameters
 if (!isset($_GET['id'])) {
     Functions::jsRedirect(url: '?page=attracties.overzicht');
 }
 
+// Draw the sidebar with navigation options
 Functions::drawSidebar(options: [
     ['label' => 'Overzicht', 'page' => 'attracties.overzicht'],
     ['label' => 'Add', 'page' => 'attracties.add']
 ]);
 
+// Get the database instance
 $database = Database::getInstance();
 
+// Sanitize the 'id' from GET parameters
 $attractie_id = DataProcessor::sanitizeData(data: $_GET['id']);
 
+// Query to fetch attractie details
 $query_attractie = $database->query(query: "
 SELECT attractie.id, attractie.naam, attractie.locatie, attractie.foto, attractie.specificaties,
         attractie_type.naam AS type_naam, attractie_type.id AS type_id
@@ -31,12 +34,14 @@ SELECT attractie.id, attractie.naam, attractie.locatie, attractie.foto, attracti
 
 $attractie = $query_attractie->fetch(PDO::FETCH_ASSOC);
 
+// Query to fetch all attractie types
 $query_typen = $database->query(query: "
 SELECT * 
     FROM attractie_type;
 ");
 $typen = $query_typen->fetchAll(PDO::FETCH_ASSOC);
 
+// Redirect if no attractie found
 if (empty($attractie)) {
     Functions::jsRedirect(url: '?page=attracties.overzicht');
 }

@@ -17,14 +17,21 @@ if (!Functions::checkPermissions(permissions: ['monteur'])) {
     die('Access denied');
 }
 
+// Draw the sidebar with the 'Overzicht' option
 Functions::drawSidebar(options: [
     ['label' => 'Overzicht', 'page' => 'onderhoud.overzicht']
 ]);
 
+// Get the database instance
 $database = Database::getInstance();
+
+// Get today's date
 $today = date('Y-m-d');
 
+// Set up the query parameters
 $params = [];
+
+// Massive query to select all rows from the onderhoud table
 $query = "
 SELECT o.id, 
         ot.beschrijving, ot.start_datum, ot.duur_dagen, ot.herhaling_dagen,
@@ -44,14 +51,19 @@ AND (ot.start_datum = :today
 ORDER BY FIELD(s.naam, 'Niet Gestart', 'In Behandeling', 'Voltooid')
 ";
 
+// Set the query parameters
 $params['medewerker_id'] = Session::get('user')['id'];
 $params['today'] = $today;
 
+// Execute the query
 $query_onderhoud = $database->query($query, $params);
+// Fetch all results as an associative array
 $onderhoud = $query_onderhoud->fetchAll(PDO::FETCH_ASSOC);
 
+// Set the table headers
 $headers = ['status', 'attractie', 'beschrijving', 'start_datum', 'eind_datum', 'acties'];
 if (!empty($onderhoud)) {
+    // Map over the results and add the 'eind_datum' and 'acties' columns
     $onderhoud = array_map(function($onderhoud_) {
         $onderhoud_['eind_datum'] = date('Y-m-d', strtotime($onderhoud_['start_datum'] . ' + ' . $onderhoud_['duur_dagen'] . ' days'));
         $onderhoud_['acties'] = "

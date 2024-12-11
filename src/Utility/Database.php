@@ -7,8 +7,13 @@ use PDOException;
 use PDOStatement;
 use App\Core\Configuration;
 
-
-
+/**
+ * Class Database
+ *
+ * This class provides a Singleton database connection using PDO.
+ *
+ * @author Martan van Verseveld
+ */
 class Database
 {
     private static ?Database $instance = null;
@@ -17,6 +22,11 @@ class Database
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ];
 
+    /**
+     * Database constructor.
+     *
+     * Initializes the database connection using configuration settings.
+     */
     private function __construct()
     {
         $host = Configuration::read('db.host');
@@ -35,10 +45,14 @@ class Database
         }
     }
 
-    // Prevent cloning the Singleton instance
+    /**
+     * Prevent cloning the Singleton instance.
+     */
     private function __clone() {}
 
-    // Prevent unserializing the Singleton instance
+    /**
+     * Prevent unserializing the Singleton instance.
+     */
     public function __wakeup() {}
 
     /**
@@ -49,7 +63,6 @@ class Database
     public static function getInstance(): Database
     {
         if (self::$instance === null) {
-            // No arguments needed, configuration is handled inside the constructor
             self::$instance = new self();
         }
         return self::$instance;
@@ -58,8 +71,8 @@ class Database
     /**
      * Perform a database query with optional parameters.
      *
-     * @param string $query
-     * @param array $params
+     * @param string $query The SQL query to execute.
+     * @param array $params The parameters to bind to the query.
      * @return PDOStatement
      */
     public function query(string $query, array $params = []): PDOStatement
